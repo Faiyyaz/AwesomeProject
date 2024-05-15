@@ -8,13 +8,18 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import {NavigationContainer, ParamListBase} from '@react-navigation/native';
 
-import {View, Text, Button, TouchableWithoutFeedback} from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  TouchableWithoutFeedback,
+  TextInput,
+} from 'react-native';
 import {
   CardStyleInterpolators,
   StackNavigationProp,
   createStackNavigator,
 } from '@react-navigation/stack';
-import Modal from 'react-native-modal';
 
 type HomeScreenProps = {
   navigation: StackNavigationProp<ParamListBase>;
@@ -24,6 +29,8 @@ function HomeScreen({navigation}: HomeScreenProps) {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Home Screen</Text>
+      <TextInput placeholder="Type here" />
+
       <Button
         title="Present Bottom Modal"
         onPress={() => navigation.push('Details')}
@@ -33,35 +40,6 @@ function HomeScreen({navigation}: HomeScreenProps) {
 }
 
 function DetailsScreen({navigation}: HomeScreenProps) {
-  const [isVisible, setIsVisible] = React.useState(false);
-
-  function WrapperComponent() {
-    return (
-      <View>
-        <Modal
-          onBackdropPress={() => setIsVisible(false)}
-          propagateSwipe={true}
-          animationIn="slideInUp"
-          animationInTiming={600}
-          backdropTransitionInTiming={600}
-          backdropTransitionOutTiming={600}
-          useNativeDriver={true}
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0,
-            margin: 0,
-            zIndex: 0,
-          }}
-          isVisible={isVisible}>
-          <View style={{backgroundColor: 'white', padding: 16}}>
-            <Text>I am the modal content!</Text>
-          </View>
-        </Modal>
-      </View>
-    );
-  }
-
   return (
     <TouchableWithoutFeedback onPress={() => navigation.pop()}>
       <View style={{flex: 1}}>
@@ -76,9 +54,34 @@ function DetailsScreen({navigation}: HomeScreenProps) {
             backgroundColor: 'red',
             height: 200,
           }}>
-          <Button title="Open Modal" onPress={() => setIsVisible(true)} />
+          <Button
+            title="Open Modal"
+            onPress={() => {
+              navigation.goBack();
+              setTimeout(() => {
+                navigation.push('Details2');
+              }, 200); // Adjust delay as needed
+            }}
+          />
         </View>
-        <WrapperComponent />
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
+function DetailsScreen2({navigation}: HomeScreenProps) {
+  return (
+    <TouchableWithoutFeedback onPress={() => navigation.pop()}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{backgroundColor: 'white', padding: 16}}>
+          <Text>I am the modal content!</Text>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -98,6 +101,18 @@ function App(): React.JSX.Element {
             presentation: 'transparentModal',
             cardStyle: {backgroundColor: 'transparent'},
             cardOverlayEnabled: false,
+            headerShown: false,
+            cardStyleInterpolator:
+              CardStyleInterpolators.forModalPresentationIOS,
+          }}
+        />
+        <Stack.Screen
+          name="Details2"
+          component={DetailsScreen2}
+          options={{
+            presentation: 'transparentModal',
+            cardStyle: {backgroundColor: 'transparent'},
+            cardOverlayEnabled: true,
             headerShown: false,
             cardStyleInterpolator:
               CardStyleInterpolators.forModalPresentationIOS,
